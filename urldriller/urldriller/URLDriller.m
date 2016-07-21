@@ -22,7 +22,8 @@
         && urlString
         && urlString.length > 0) {
         self.delegate = delegate;
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]
+        NSString *escapedPath = [urlString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:escapedPath]
                                 cachePolicy:NSURLRequestUseProtocolCachePolicy
                             timeoutInterval:60];
         request.HTTPMethod = @"GET";
