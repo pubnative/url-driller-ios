@@ -19,6 +19,6 @@
 
 @interface URLDriller : NSObject
 
-- (void)startDrillWithURLString:(NSString*)urlString;
+- (void)startDrillWithURLString:(NSString*)urlString delegate:(NSObject<URLDrillerDelegate>*)delegate;
 
 @end

@@ -16,9 +16,12 @@
 
 @implementation URLDriller
 
-- (void)startDrillWithURLString:(NSString *)urlString
+- (void)startDrillWithURLString:(NSString *)urlString delegate:(NSObject<URLDrillerDelegate>*)delegate
 {
-    if (urlString && urlString.length > 0) {
+    if (delegate
+        && urlString
+        && urlString.length > 0) {
+        self.delegate = delegate;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]
                                 cachePolicy:NSURLRequestUseProtocolCachePolicy
                             timeoutInterval:60];
@@ -34,7 +37,7 @@
             
             if (response != nil) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate didFinishURLString:urlString];
+                    [self.delegate didFinishURLString:[response.URL absoluteString]];
                 });
             } else {
                 NSError *error = [[NSError alloc] initWithDomain:@"Respons is empty" code:0 userInfo:nil];
@@ -54,8 +57,9 @@
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate didRedirectURLString:[request.URL absoluteString]];
+        [self.delegate didRedirectURLString:[response.URL absoluteString]];
     });
+    completionHandler(request);
 }
 
 @end
