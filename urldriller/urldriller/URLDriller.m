@@ -26,7 +26,6 @@
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:escapedPath]
                                 cachePolicy:NSURLRequestUseProtocolCachePolicy
                             timeoutInterval:60];
-        request.HTTPMethod = @"GET";
         
         NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
         NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -58,9 +57,16 @@
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.delegate didRedirectURLString:[response.URL absoluteString]];
+        [self.delegate didRedirectURLString:[request.URL absoluteString]];
     });
-    completionHandler(request);
+    
+    if ([request.URL.scheme isEqualToString:@"itms-apps"]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.delegate didFinishURLString:[request.URL absoluteString]];
+        });
+    } else {
+        completionHandler(request);
+    }
 }
 
 @end
